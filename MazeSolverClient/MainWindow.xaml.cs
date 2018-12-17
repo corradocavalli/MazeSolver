@@ -23,6 +23,7 @@ namespace MazeSolverClient
     public partial class MainWindow : Window
     {
         private MazeClient client;
+        private MazeSolverEngine engine;
 
         public MainWindow()
         {
@@ -53,6 +54,12 @@ namespace MazeSolverClient
         private async void OnPositions(object sender, RoutedEventArgs e)
         {
             var response = await this.client.GetPositionAsync();
+        }
+
+        private async void OnSolve(object sender, RoutedEventArgs e)
+        {
+            this.engine = new MazeSolverEngine(this.client);
+            await this.engine.SolveAsync();
         }
     }
 }

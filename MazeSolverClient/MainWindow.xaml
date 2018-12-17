@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <StackPanel>
+        <StackPanel Width="200">
             <Button Content="State" Click="OnGetState" />
             <Button Content="Move"
                     Click="OnMove" />
@@ -18,6 +18,10 @@
 
             <Button Content="Position"
                     Click="OnPositions" />
+
+            <Button Content="Solve!"
+                    Click="OnSolve" />
+
         </StackPanel>
         
     </Grid>

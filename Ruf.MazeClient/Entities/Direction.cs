@@ -1,4 +1,6 @@
-﻿namespace Ruf.MazeClient.Entities
+﻿using System;
+
+namespace Ruf.MazeClient.Entities
 {
     /// <summary>
     /// Allowed server direction
@@ -8,6 +10,7 @@
         North,
         East,
         South,
-        West
+        West,
+        Unknown
     }
 }

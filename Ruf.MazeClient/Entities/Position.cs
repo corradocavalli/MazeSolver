@@ -1,8 +1,10 @@
 ﻿#region Using
 
-using System.Drawing;
+
 
 #endregion
+
+using System.Drawing;
 
 namespace Ruf.MazeClient.Entities
 {
