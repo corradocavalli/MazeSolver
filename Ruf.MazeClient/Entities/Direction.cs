@@ -12,5 +12,6 @@ namespace Ruf.MazeClient.Entities
         South,
         West,
         Unknown
+        
     }
 }

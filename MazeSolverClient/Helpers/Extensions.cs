@@ -16,7 +16,7 @@ namespace MazeSolverClient.Helpers
         /// <returns>
         ///   <c>true</c> if [has cross points] [the specified directions]; otherwise, <c>false</c>.
         /// </returns>
-        public static bool HasCrossPoints(this Directions directions, Direction from)
+        public static bool IsCrossPoints(this Directions directions, Direction from)
         {
             if (@from == Direction.North || from == Direction.South)
             {

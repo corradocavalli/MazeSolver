@@ -1,26 +1,29 @@
-﻿using System;
+﻿#region Using
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
-using System.Security;
-using System.Windows;
+using System.Linq;
+using System.Threading.Tasks;
 using MazeSolverClient.Helpers;
 using Ruf.MazeClient;
 using Ruf.MazeClient.Entities;
-using Point = System.Drawing.Point;
+
+#endregion
 
 namespace MazeSolverClient
 {
-    public class MazeSolverEngine
+    //http://www.manuelmarangoni.it/onemind/5804/come-uscire-da-un-labirinto-senza-perdersi-il-metodo-di-tremaux/
+    //https://de.wikipedia.org/wiki/Tr%C3%A9maux%E2%80%99_Methode
+
+    public partial class MazeSolverEngine
     {
         private readonly MazeClient client;
-        private List<CrossInfo> crossPoints = new List<CrossInfo>();
+        private readonly List<Entities.MazeSolverEngine.CrossInfo> crossPoints = new List<Entities.MazeSolverEngine.CrossInfo>();
         private CurrentPosition position;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MazeSolverEngine"/> class.
+        /// Initializes a new instance of the <see cref="Entities.MazeSolverEngine"/> class.
         /// </summary>
         /// <param name="mazeClient">The maze client.</param>
         /// <exception cref="ArgumentNullException">client</exception>
@@ -31,118 +34,103 @@ namespace MazeSolverClient
 
         public async Task<bool> SolveAsync()
         {
-            CrossInfo crossPoint = null;
+            this.crossPoints.Clear();
             bool success = this.client.Reset();
             if (success)
             {
                 this.position = await this.client.GetPositionAsync();
-                if (this.position.Success)
+                var crossPoint = await this.GetCrossPointAsync(this.position.Position);
+                if (crossPoint != null)
                 {
-                    Directions allowedDirections = await this.client.GetDirectionsAsync();
-                    bool isCross = allowedDirections.HasCrossPoints(Direction.Unknown);
-                    if (isCross)
-                    {
-                        crossPoint = new CrossInfo(position.Position, Direction.North);
-                        this.crossPoints.Add(crossPoint);
-                    }
-
-                    if (allowedDirections.Success)
-                    {
-                        await this.TraversePathAsync(crossPoint, allowedDirections);
-
-
-
-
-
-
-                    }
+                    var direction = crossPoint.ChooseCrossDirection(Direction.Unknown);
+                    await this.TraversePathAsync(crossPoint, crossPoint.);
                 }
-
             }
 
             return true;
-
         }
 
-        private async Task TraversePathAsync(CrossInfo crossPoint, Directions directions)
-        {
-            List<Direction> supportedDirections = directions.ToDirections();
-            foreach (Direction directionToFollow in supportedDirections)
-            {
-                await this.FollowBranchAsync(crossPoint,directionToFollow);
-            }
-        }
-
-        private async Task FollowBranchAsync(CrossInfo from, Direction directionToFollow)
+        private async Task FollowBranchAsync(Entities.MazeSolverEngine.CrossInfo from, Direction directionToFollow)
         {
             //Moves cursor
             while (true)
             {
                 await this.client.MoveAsync(directionToFollow);
                 this.position = await this.client.GetPositionAsync();
-
                 Directions allowedDirections = await this.client.GetDirectionsAsync();
-                bool isCross = allowedDirections.HasCrossPoints(directionToFollow);
+
+                bool isCross = allowedDirections.IsCrossPoints(directionToFollow);
                 if (isCross)
                 {
-                    var crossPoint = new CrossInfo(position.Position, Direction.North);
-                    if (crossPoint.IsStart)
-                    {
-                        return;
-                    }
+                    (Entities.MazeSolverEngine.CrossInfo crossInfo, bool exist) = this.GetCrossPoint(this.position.Position);
+                    crossInfo.Enter(directionToFollow);
 
-                    this.crossPoints.Add(crossPoint);
-                    await this.TraversePathAsync(crossPoint, allowedDirections);
+                    //System.Diagnostics.Debug.WriteLine($"Cross-{this.position.Position.X}-{this.position.Position.Y}->N:{allowedDirections.North}/S:{allowedDirections.South}/E{allowedDirections.East}/W:{allowedDirections.West}");
+
+                    //allowedDirections = this.GetAllowedDirections(crossInfo, allowedDirections);
+
+                    await this.TraversePathAsync(crossInfo, allowedDirections);
                 }
                 else
                 {
                     bool hitEnd = allowedDirections.HitEnd(directionToFollow);
                     if (hitEnd)
                     {
-                        if (this.position.Position == from.Point)
-                        {
-                            return;
-                        }
-
                         //Reverse branch back
                         await this.FollowBranchAsync(from, directionToFollow.Reverse());
-                        return;
                     }
                 }
             }
         }
 
-
-        private class CrossInfo
+        private Directions GetAllowedDirections(Entities.MazeSolverEngine.CrossInfo crossInfo, Directions allowedDirections)
         {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="CrossInfo"/> class.
-            /// </summary>
-            /// <param name="point">The point.</param>
-            /// <param name="from">From.</param>
-            public CrossInfo(Point point, Direction from)
+            if (allowedDirections.North && crossInfo.NorthMarks == 2) allowedDirections.North = false;
+            if (allowedDirections.South && crossInfo.SouthMarks == 2) allowedDirections.South = false;
+            if (allowedDirections.West && crossInfo.WestMarks == 2) allowedDirections.West = false;
+            if (allowedDirections.East && crossInfo.EastMarks == 2) allowedDirections.East = false;
+
+            return allowedDirections;
+        }
+
+        /// <summary>
+        /// Gets the cross point for provided position or creates a new one if it doesn't exist.
+        /// </summary>
+        /// <param name="position">The position.</param>
+        /// <returns></returns>
+        private async Task<Entities.MazeSolverEngine.CrossInfo> GetCrossPointAsync(Point position)
+        {
+            //Does the cross point already exist?
+            var point = this.crossPoints.FirstOrDefault(p => p.Point == this.position.Position);
+            if (point != null)
             {
-                this.Point = point;
-                this.From = from;
+                return point;
             }
 
-            /// <summary>
-            /// Gets the point.
-            /// </summary>
-            /// <value>
-            /// The point.
-            /// </value>
-            public Point Point { get; }
+            //Creates a brand new cross info and return it
+            Directions supportedDirections = await this.client.GetDirectionsAsync();
+            bool isCross = supportedDirections.IsCrossPoints(Direction.Unknown);
+            if (isCross)
+            {
+                Entities.MazeSolverEngine.CrossInfo info = new Entities.MazeSolverEngine.CrossInfo(position, supportedDirections);
+                this.crossPoints.Add(info);
+                return info;
+            }
 
-            /// <summary>
-            /// Gets from.
-            /// </summary>
-            /// <value>
-            /// From.
-            /// </value>
-            public Direction From { get; }
+            return null;
+        }
 
-            public bool IsStart => this.Point.X == 1 && this.Point.Y == 1;
+        private async Task TraversePathAsync(Entities.MazeSolverEngine.CrossInfo crossPoint, Directions directions)
+        {
+            List<Direction> supportedDirections = directions.ToDirections();
+            foreach (Direction directionToFollow in supportedDirections)
+            {
+                if (crossPoint.CanGo(directionToFollow))
+                {
+                    crossPoint.Leave(directionToFollow);
+                    await this.FollowBranchAsync(crossPoint, directionToFollow);
+                }
+            }
         }
     }
 }
