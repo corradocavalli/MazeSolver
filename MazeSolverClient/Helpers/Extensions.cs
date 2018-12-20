@@ -16,18 +16,11 @@ namespace MazeSolverClient.Helpers
         /// <returns>
         ///   <c>true</c> if [has cross points] [the specified directions]; otherwise, <c>false</c>.
         /// </returns>
-        public static bool IsCrossPoints(this Directions directions, Direction from)
+        public static bool IsCrossPoint(this Directions directions)
         {
-            if (@from == Direction.North || from == Direction.South)
-            {
-                return directions.East || directions.West;
-            }
-            if (@from == Direction.East || from == Direction.West)
-            {
-                return directions.North || directions.South;
-            }
+            return (directions.North || directions.South) && (directions.East || directions.West) || 
+                   (directions.East || directions.West) && (directions.North || directions.South);
 
-            return directions.ToDirections().Count > 1;
         }
 
         public static bool HitEnd(this Directions directions, Direction from)
@@ -63,7 +56,7 @@ namespace MazeSolverClient.Helpers
                 case Direction.West:
                     return Direction.East;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
+                    return Direction.Unknown;
             }
 
 
