@@ -59,14 +59,6 @@ namespace MazeSolverClient
             {
                 await this.client.MoveAsync(directionToFollow);
                 this.position = await this.client.GetPositionAsync();
-
-                System.Diagnostics.Debug.WriteLine($"{this.position.Position.X}");
-
-                if (this.position.Position.X == 13)
-                {
-                    var x = 0;
-                }
-
                 var crossPoint = await this.GetCrossPointAsync(this.position.Position);
                 if (crossPoint != null)
                 {

@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MazeSolverClient.Entities;
 using Ruf.MazeClient.Entities;
 
 namespace MazeSolverClient.Helpers
 {
     public static class Extensions
     {
+        private static readonly Random Rnd = new Random();
+
+
         /// <summary>
         /// Determines whether directions represent a cross point.
         /// </summary>
@@ -18,7 +23,7 @@ namespace MazeSolverClient.Helpers
         /// </returns>
         public static bool IsCrossPoint(this Directions directions)
         {
-            return (directions.North || directions.South) && (directions.East || directions.West) || 
+            return (directions.North || directions.South) && (directions.East || directions.West) ||
                    (directions.East || directions.West) && (directions.North || directions.South);
 
         }
@@ -58,8 +63,13 @@ namespace MazeSolverClient.Helpers
                 default:
                     return Direction.Unknown;
             }
+        }
 
-
+        public static Direction GetRandomSide(this List<Side> sides, Direction from)
+        {
+            sides = sides.Where(s => s.Direction != from).ToList();
+            var side= sides.ElementAt(Rnd.Next(0, sides.Count() - 1));
+            return side.Direction;
         }
     }
 }

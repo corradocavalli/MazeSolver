@@ -15,8 +15,7 @@ namespace MazeSolverClient.Entities
     public class CrossPoint
     {
         private readonly List<Side> sides=new List<Side>();
-        private readonly Random rnd;
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="CrossPoint"/> class.
         /// </summary>
@@ -50,8 +49,6 @@ namespace MazeSolverClient.Entities
                 this.AvailableDirections.Add(Direction.West);
                 this.sides.Add(new Side(Direction.West));
             }
-
-            this.rnd = new Random();
         }
 
         public List<Direction> AvailableDirections { get; }
@@ -80,10 +77,8 @@ namespace MazeSolverClient.Entities
             //Never visited cross, choose random one.. (case 1)
             if (this.sides.Sum(side => side.Marks) == 0)
             {
-                int index = this.rnd.Next(0, this.sides.Count - 1);
-                Direction leave = this.sides[index].Direction;
+                Direction leave = this.sides.GetRandomSide(enter);
                 this.Mark(enter);
-
                 this.Mark(leave);
                 return leave;
             }
@@ -103,12 +98,11 @@ namespace MazeSolverClient.Entities
                 }
                 else
                 {
-                    var allowedExits = this.sides.Where(s => s.Direction != from && s.Marks == 0).ToList();
+                    var allowedExits = this.sides.Where(s => s.Direction != enter && s.Marks == 0).ToList();
                     if (allowedExits.Any())
                     {
                         //Choose a random one from available unvisited exits (case 3)
-                        int index = this.rnd.Next(0, allowedExits.Count() - 1);
-                        Direction leave = allowedExits[index].Direction;
+                        Direction leave = allowedExits.GetRandomSide(enter);
                         this.Mark(enter);
                         this.Mark(leave);
                         return leave;
@@ -119,8 +113,7 @@ namespace MazeSolverClient.Entities
                         if (allowedExits.Any())
                         {
                             //Choose a random one from available unvisited exits (case 4)
-                            int index = this.rnd.Next(0, allowedExits.Count());
-                            Direction leave = allowedExits[index].Direction;
+                            Direction leave = allowedExits.GetRandomSide(enter);
                             this.Mark(enter);
                             this.Mark(leave);
                             return leave;
@@ -131,20 +124,6 @@ namespace MazeSolverClient.Entities
 
             return Direction.Unknown;
         }
-        private class Side
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="Side" /> class.
-            /// </summary>
-            /// <param name="direction">The direction.</param>
-            public Side(Direction direction)
-            {
-                if (direction == Direction.Unknown) throw new ArgumentOutOfRangeException(nameof(direction), "Unknown is not a valid value for side direction.");
-                this.Direction = direction;
-            }
-
-            public int Marks { get; set; }
-            public Direction Direction { get; }
-        }
+        
     }
 }
