@@ -49,9 +49,11 @@ namespace MazeSolverClient
         {
             this.MovesTextBlock.Text = null;
             this.SolverButton.IsEnabled = false;
+
             this.solver = this.factory.CreateSolver();
             this.solver.Progress += this.OnProgress;
             await this.solver.SolveAsync();
+
             this.solver.Progress -= this.OnProgress;
             this.SolverButton.IsEnabled = true;
         }
