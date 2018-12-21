@@ -13,9 +13,11 @@ using Ruf.MazeSolver.Helpers;
 
 namespace Ruf.MazeSolver
 {
-    //http://www.manuelmarangoni.it/onemind/5804/come-uscire-da-un-labirinto-senza-perdersi-il-metodo-di-tremaux/
-    //https://de.wikipedia.org/wiki/Tr%C3%A9maux%E2%80%99_Methode
-
+    /// <summary>
+    /// Solves a maze using Tremaux algoritmm
+    /// </summary>
+    /// <see cref="//https://de.wikipedia.org/wiki/Tr%C3%A9maux%E2%80%99_Methode"/>
+    /// <seealso cref="Ruf.MazeSolver.MazeSolver" />
     public class TremauxMazeSolver : MazeSolver
     {
         private readonly MazeClient.MazeClient client;
