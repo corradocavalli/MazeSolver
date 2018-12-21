@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="Entities\CrossInfo.cs" />
     <Compile Include="Entities\Side.cs" />
+    <Compile Include="Entities\SolvingEventArgs.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>

@@ -22,6 +22,7 @@ namespace MazeSolverClient
         private readonly MazeClient client;
         private readonly List<CrossPoint> crossPoints = new List<CrossPoint>();
         private CurrentPosition position;
+        public event EventHandler<SolvingEventArgs> EngineStatus;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MazeSolverEngine"/> class.
@@ -33,59 +34,89 @@ namespace MazeSolverClient
             this.client = mazeClient ?? throw new ArgumentNullException(nameof(mazeClient));
         }
 
-        public async Task<bool> SolveAsync()
+        /// <summary>
+        /// Solves the maze.
+        /// </summary>
+        /// <returns></returns>
+        public async Task SolveAsync()
         {
             this.crossPoints.Clear();
             this.client.Reset();
 
             this.position = await this.client.GetPositionAsync();
-
-           
-            var crossPoint = await this.GetCrossPointAsync(this.position.Position);
+            CrossPoint crossPoint = await this.GetCrossPointAsync(this.position.Position);
             if (crossPoint != null)
             {
-                var direction = crossPoint.ChooseCrossDirection(Direction.Unknown, false);
-                await this.FollowBranchAsync(direction, false);
+                Direction direction = crossPoint.ChooseCrossDirection(Direction.Unknown);
+                await this.TraverseBranchAsync(direction);
             }
-
-
-            return true;
         }
 
-        private async Task FollowBranchAsync(Direction directionToFollow, bool isBackward)
+        /// <summary>
+        /// Traverses the branch.
+        /// </summary>
+        /// <param name="directionToFollow">The direction to follow.</param>
+        /// <returns>True when target reached</returns>
+        private async Task<bool> TraverseBranchAsync(Direction directionToFollow)
         {
-            //Moves cursor
             while (true)
             {
+                //Move position
                 await this.client.MoveAsync(directionToFollow);
+                //Get state of the new position
+                var state = await this.client.GetStateAsync();
+                //Report current status
                 this.position = await this.client.GetPositionAsync();
-                var crossPoint = await this.GetCrossPointAsync(this.position.Position);
-                if (crossPoint != null)
+
+                //HACK: Looks like server never returns TargetReached state, we simulated it base on current position
+                bool targetReached= this.position.Position.X == 19 && this.position.Position.Y == 21;
+                
+                //If target reached, stop traversing
+                if (state.Value == StateValue.TargetReached || targetReached)
                 {
-                    var direction = crossPoint.ChooseCrossDirection(directionToFollow, isBackward);
-                    await this.FollowBranchAsync(direction, false);
+                    this.OnEngineStatus(new SolvingEventArgs(StateValue.TargetReached, this.position.Position));
+                    return true;
                 }
                 else
                 {
+                    this.OnEngineStatus(new SolvingEventArgs(state.Value, this.position.Position));
+                }
+
+                //Are we on a cross point?
+                var crossPoint = await this.GetCrossPointAsync(this.position.Position);
+                if (crossPoint != null)
+                {
+                    //Get the best direction to follow at the cross point and follow it recursively
+                    var direction = crossPoint.ChooseCrossDirection(directionToFollow);
+                    bool reached= await this.TraverseBranchAsync(direction);
+                    if (reached) return true;
+                }
+                else
+                {
+                    //Keep following the branch taking care of optional deviations
                     Directions supportedDirections = await this.client.GetDirectionsAsync();
+                    directionToFollow = this.GetNextDirection(supportedDirections, directionToFollow);
+                    //If we hit the end of the branch, we turn back
                     bool hitEnd = supportedDirections.HitEnd(directionToFollow);
                     if (hitEnd)
                     {
-                        //Reverse branch back
-                        await this.FollowBranchAsync(directionToFollow.Reverse(), true);
-                    }
-                    else
-                    {
-                        directionToFollow = await this.GetNextDirectionAsync(directionToFollow);
+                        bool reached= await this.TraverseBranchAsync(directionToFollow.Reverse());
+                        if (reached) return true;
                     }
                 }
             }
         }
 
-        private async Task<Direction> GetNextDirectionAsync(Direction from)
+        /// <summary>
+        /// Gets the next direction asynchronous.
+        /// </summary>
+        /// <param name="availableDirections">The available directions to follow.</param>
+        /// <param name="from">Direction we're coming from</param>
+        /// <returns>Available direction</returns>
+        /// <remarks>Allow traversing taking care of optional corners</remarks>
+        private Direction GetNextDirection(Directions availableDirections, Direction from)
         {
-            Directions supportedDirections = await this.client.GetDirectionsAsync();
-            var directions = supportedDirections.ToDirections();
+            List<Direction> directions = availableDirections.ToDirections();
             if (directions.Contains(from))
             {
                 return from;
@@ -94,12 +125,11 @@ namespace MazeSolverClient
             return directions.First();
         }
 
-
         /// <summary>
         /// Gets the cross point for provided position or creates a new one if it doesn't exist.
         /// </summary>
-        /// <param name="position">The position.</param>
-        /// <returns></returns>
+        /// <param name="position">The current maze position.</param>
+        /// <returns>An existing crosspoint or a brand new one if not already hit, null if current position is not over any cross point</returns>
         private async Task<CrossPoint> GetCrossPointAsync(Point position)
         {
             //Does the cross point already exist?
@@ -120,6 +150,11 @@ namespace MazeSolverClient
             }
 
             return null;
+        }
+
+        protected virtual void OnEngineStatus(SolvingEventArgs e)
+        {
+            this.EngineStatus?.Invoke(this, e);
         }
     }
 }

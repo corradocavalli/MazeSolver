@@ -15,11 +15,12 @@ namespace MazeSolverClient.Entities
     public class CrossPoint
     {
         private readonly List<Side> sides=new List<Side>();
-        
+
         /// <summary>
-        /// Initializes a new instance of the <see cref="CrossPoint"/> class.
+        /// Initializes a new instance of the <see cref="CrossPoint" /> class.
         /// </summary>
         /// <param name="position">The position.</param>
+        /// <param name="availableDirections">The available directions.</param>
         public CrossPoint(Point position, Directions availableDirections)
         {
             this.Position = position;
@@ -70,7 +71,7 @@ namespace MazeSolverClient.Entities
             }
         }
 
-        public Direction ChooseCrossDirection(Direction from, bool isBackward)
+        public Direction ChooseCrossDirection(Direction from)
         {
             var enter = from.Reverse();
 
