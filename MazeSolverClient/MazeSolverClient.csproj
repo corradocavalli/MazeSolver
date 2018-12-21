@@ -64,17 +64,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Entities\CrossInfo.cs" />
-    <Compile Include="Entities\Side.cs" />
-    <Compile Include="Entities\SolvingEventArgs.cs" />
-    <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MazeSolverEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -104,6 +99,10 @@
     <ProjectReference Include="..\Ruf.MazeClient\Ruf.MazeClient.csproj">
       <Project>{8ecf3196-3daa-4eea-a907-2ad68a5c2142}</Project>
       <Name>Ruf.MazeClient</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Ruf.MazeSolver\Ruf.MazeSolver.csproj">
+      <Project>{e9a8668d-ff99-4833-bede-d5e4213522c2}</Project>
+      <Name>Ruf.MazeSolver</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

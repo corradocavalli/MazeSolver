@@ -1,18 +1,20 @@
 ﻿#region Using
 
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using MazeSolverClient.Helpers;
 using Ruf.MazeClient.Entities;
+using Ruf.MazeSolver.Helpers;
 
 #endregion
 
-namespace MazeSolverClient.Entities
+namespace Ruf.MazeSolver.Entities
 {
 
-    public class CrossPoint
+    /// <summary>
+    /// Represents a cross point
+    /// </summary>
+    internal class CrossPoint
     {
         private readonly List<Side> sides=new List<Side>();
 
@@ -52,6 +54,12 @@ namespace MazeSolverClient.Entities
             }
         }
 
+        /// <summary>
+        /// Gets the available directions.
+        /// </summary>
+        /// <value>
+        /// The available directions.
+        /// </value>
         public List<Direction> AvailableDirections { get; }
 
         /// <summary>
@@ -63,6 +71,10 @@ namespace MazeSolverClient.Entities
         public Point Position { get; }
 
 
+        /// <summary>
+        /// Marks a specific side of the cross point.
+        /// </summary>
+        /// <param name="direction">The direction.</param>
         private void Mark(Direction direction)
         {
             if(direction != Direction.Unknown)
@@ -71,6 +83,11 @@ namespace MazeSolverClient.Entities
             }
         }
 
+        /// <summary>
+        /// Returns the direction to follow after we reached a cross point.
+        /// </summary>
+        /// <param name="from">From.</param>
+        /// <returns></returns>
         public Direction ChooseCrossDirection(Direction from)
         {
             var enter = from.Reverse();
@@ -125,6 +142,5 @@ namespace MazeSolverClient.Entities
 
             return Direction.Unknown;
         }
-        
     }
 }

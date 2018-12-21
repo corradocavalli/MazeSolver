@@ -5,24 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:MazeSolverClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Maze Solver by Corrado Cavalli"
+        Height="450"
+        Width="800">
     <Grid>
-        <StackPanel Width="200">
-            <Button Content="State" Click="OnGetState" />
-            <Button Content="Move"
-                    Click="OnMove" />
-            <Button Content="Reset"
-                    Click="OnReset" />
-            <Button Content="Directions"
-                    Click="OnDirections" />
-
-            <Button Content="Position"
-                    Click="OnPositions" />
-
-            <Button Content="Solve!"
+        <TextBlock x:Name="MovesTextBlock"
+                   Foreground="LightBlue"
+                   FontSize="78"
+                   Margin="0,-180,0,0"
+                   VerticalAlignment="Center"
+                   HorizontalAlignment="Center" />
+        <StackPanel Width="200"
+                    VerticalAlignment="Center">
+            <Button Content="Solve the maze!"
+                    Height="50"
+                    x:Name="SolverButton"
                     Click="OnSolve" />
-
+            <TextBlock x:Name="ProgressTextBlock"
+                       Margin="0,20,0,0"
+                       HorizontalAlignment="Center" />
         </StackPanel>
-        
+
     </Grid>
 </Window>

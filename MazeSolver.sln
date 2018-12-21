@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MazeSolverClient", "MazeSolverClient\MazeSolverClient.csproj", "{AC2682FC-AC2D-4189-912A-56DAA6CB6FE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ruf.MazeClient", "Ruf.MazeClient\Ruf.MazeClient.csproj", "{8ECF3196-3DAA-4EEA-A907-2AD68A5C2142}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ruf.MazeClient", "Ruf.MazeClient\Ruf.MazeClient.csproj", "{8ECF3196-3DAA-4EEA-A907-2AD68A5C2142}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ruf.MazeSolver", "Ruf.MazeSolver\Ruf.MazeSolver.csproj", "{E9A8668D-FF99-4833-BEDE-D5E4213522C2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{8ECF3196-3DAA-4EEA-A907-2AD68A5C2142}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ECF3196-3DAA-4EEA-A907-2AD68A5C2142}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8ECF3196-3DAA-4EEA-A907-2AD68A5C2142}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9A8668D-FF99-4833-BEDE-D5E4213522C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9A8668D-FF99-4833-BEDE-D5E4213522C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9A8668D-FF99-4833-BEDE-D5E4213522C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9A8668D-FF99-4833-BEDE-D5E4213522C2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

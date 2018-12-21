@@ -5,9 +5,12 @@ using Ruf.MazeClient.Entities;
 
 #endregion
 
-namespace MazeSolverClient.Entities
+namespace Ruf.MazeSolver.Entities
 {
-    public class Side
+    /// <summary>
+    /// Represents a cross point side
+    /// </summary>
+    internal class Side
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Side" /> class.
@@ -19,8 +22,20 @@ namespace MazeSolverClient.Entities
             this.Direction = direction;
         }
 
+        /// <summary>
+        /// Gets the side direction.
+        /// </summary>
+        /// <value>
+        /// The direction.
+        /// </value>
         public Direction Direction { get; }
 
+        /// <summary>
+        /// Gets or sets the marks for this side.
+        /// </summary>
+        /// <value>
+        /// The marks.
+        /// </value>
         public int Marks { get; set; }
     }
 }

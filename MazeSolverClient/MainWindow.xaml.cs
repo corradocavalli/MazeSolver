@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿#region Using
+
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Ruf.MazeClient;
 using Ruf.MazeClient.Entities;
+using Ruf.MazeSolver;
+using Ruf.MazeSolver.Entities;
+
+#endregion
 
 namespace MazeSolverClient
 {
@@ -22,44 +15,45 @@ namespace MazeSolverClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MazeClient client;
-        private MazeSolverEngine engine;
+        private readonly MazeSolverFactory factory;
+        private MazeSolver solver;
+
 
         public MainWindow()
         {
-            InitializeComponent();
-            this.client = new MazeClient("http://localhost:3000");
+            this.InitializeComponent();
+
+            //Initializes communication client and factory
+            MazeClient client = new MazeClient("http://localhost:3000");
+            this.factory = new MazeSolverFactory(client);
         }
 
-        private async void OnGetState(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Called when progress event is raised.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="SolvingEventArgs"/> instance containing the event data.</param>
+        private void OnProgress(object sender, SolvingEventArgs e)
         {
-            var response = await this.client.GetStateAsync();
+            this.ProgressTextBlock.Text = e.ProgressState == StateValue.OnTheWay ? $"Moving to X:{e.Position.X} Y:{e.Position.Y}" : $"Target reached at X:{e.Position.X} Y:{e.Position.Y}";
+            this.MovesTextBlock.Text = e.Moves.ToString();
         }
 
-        private async void OnMove(object sender, RoutedEventArgs e)
-        {
-            var response = await this.client.MoveAsync(Direction.East);
-        }
 
-        private void OnReset(object sender, RoutedEventArgs e)
-        {
-            var response= this.client.Reset();
-        }
-
-        private async void OnDirections(object sender, RoutedEventArgs e)
-        {
-            var response = await this.client.GetDirectionsAsync();
-        }
-
-        private async void OnPositions(object sender, RoutedEventArgs e)
-        {
-            var response = await this.client.GetPositionAsync();
-        }
-
+        /// <summary>
+        /// Called when solve button is clicked.
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="e">The <see cref="RoutedEventArgs"/> instance containing the event data.</param>
         private async void OnSolve(object sender, RoutedEventArgs e)
         {
-            this.engine = new MazeSolverEngine(this.client);
-            await this.engine.SolveAsync();
+            this.MovesTextBlock.Text = null;
+            this.SolverButton.IsEnabled = false;
+            this.solver = this.factory.CreateSolver();
+            this.solver.Progress += this.OnProgress;
+            await this.solver.SolveAsync();
+            this.solver.Progress -= this.OnProgress;
+            this.SolverButton.IsEnabled = true;
         }
     }
 }

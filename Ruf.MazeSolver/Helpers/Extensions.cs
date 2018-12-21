@@ -3,17 +3,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MazeSolverClient.Entities;
 using Ruf.MazeClient.Entities;
+using Ruf.MazeSolver.Entities;
 
 #endregion
 
-namespace MazeSolverClient.Helpers
+namespace Ruf.MazeSolver.Helpers
 {
     /// <summary>
     /// Exposes all required extensions methods
     /// </summary>
-    public static class Extensions
+    internal static class Extensions
     {
         private static readonly Random Rnd = new Random();
 
